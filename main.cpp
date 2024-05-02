@@ -43,14 +43,45 @@ ZZ_p find_primitive_element_GF_p(long p) {
     exit(1);
 }
 
+void parsePrimitivePower(const ZZ& p, ZZ& tBase, ZZ& tExp) {
+    tBase = ZZ(-1);
+    tExp = ZZ(-1);
+
+    for (ZZ base = ZZ(2); base < p; base = NextPrime(base + 1)) {
+        ZZ tempP = p;
+        ZZ tempExp = ZZ(0);
+        while(divide(tempP, base)) {
+            tempP /= base;
+            tempExp++;
+        }
+
+        if(tempP == 1) {
+            tBase = base;
+            tExp = tempExp;
+            return;
+        }
+    }
+}
+
 int main() {
     long p;
-    cout << "Enter a prime number p: ";
+    cout << "Enter a prime number p or prime power p^k (example: 9 (3^2), 25(5^2), ...): ";
     cin >> p;
 
-    ZZ_p primitiveElement;
-    (p == 2) ? primitiveElement = 1 : primitiveElement = find_primitive_element_GF_p(p);
-    cout << "Primitive element in GF(" << p << "): " << primitiveElement << endl;
+    if(ProbPrime(ZZ(p))) {
+        ZZ_p primitiveElement;
+        (p == 2) ? primitiveElement = 1 : primitiveElement = find_primitive_element_GF_p(p);
+        cout << "Primitive element in GF(" << p << "): " << primitiveElement << endl;
+    } else {
+        ZZ base, exp;
+        parsePrimitivePower(ZZ(p), base, exp);
+        if(base == -1 || exp == -1) {
+            cout << "error: p must be a prime number or a prime power!" << endl;
+            return -1;
+        }
+
+        cout << base << "^" << exp << endl;
+    }
 
     return 0;
 }
