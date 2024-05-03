@@ -39,16 +39,16 @@ std::vector<ZZ_p> findPrimitiveElements(long p) {
 }
 
 int caclPrimitivePower(const ZZ& p, ZZ& tBase, ZZ& tExp) {
-    for(ZZ prime = conv<ZZ>(2); prime < p; prime = NextPrime(prime + 1)) {
+    for(ZZ base = conv<ZZ>(2); base < p; base = NextPrime(base + 1)) {
         ZZ tempP = p;
-        ZZ tempExp = ZZ(0);
-        while(divide(tempP, prime)) {
-            tempP /= prime;
+        ZZ tempExp;
+        while(divide(tempP, base)) {
+            tempP /= base;
             ++tempExp;
         }
 
         if(tempP == 1) {
-            tBase = prime;
+            tBase = base;
             tExp = tempExp;
             return 1;
         }
