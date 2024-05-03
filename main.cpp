@@ -50,11 +50,31 @@ int caclPrimitivePower(const ZZ& p, ZZ& tBase, ZZ& tExp) {
         if(tempP == 1) {
             tBase = prime;
             tExp = tempExp;
-            return 0;
+            return 1;
         }
     }
 
-    return 1;
+    return 0;
+}
+
+std::vector<ZZ_pE> findMultiplicativeGroup() {
+    std::vector<ZZ_pE> multiplicativeGroup;
+
+    while(multiplicativeGroup.size() != ZZ_pE::cardinality()) {
+        bool isAlreadyExist = false;
+        ZZ_pE el = random_ZZ_pE();
+
+        for(const auto& mem : multiplicativeGroup) {
+            if(el == mem) {
+                isAlreadyExist = true;
+                break;
+            }
+        }
+
+        if(!isAlreadyExist) multiplicativeGroup.push_back(el);
+    }
+
+    return multiplicativeGroup;
 }
 
 std::vector<ZZ_pE> findPrimitiveElements(const ZZ& field, const ZZ& polDeg) {
@@ -64,39 +84,24 @@ std::vector<ZZ_pE> findPrimitiveElements(const ZZ& field, const ZZ& polDeg) {
     ZZ_pE::init(BuildIrred_ZZ_pX(conv<long>(polDeg)));
     std::vector<ZZ_pE> allPrimElements;
 
-    while(allPrimElements.size() != ZZ_pE::cardinality()) {
-        bool alreadyExist = false;
-        ZZ_pE el;
-        random(el);
-        for(const auto& mem : allPrimElements)
-            if(el == mem) {
-                alreadyExist = true;
-                break;
-            }
-
-        if(!alreadyExist) allPrimElements.push_back(el);
-    }
-
-    ZZ_pE primitiveEl;
-    for(const auto& el : allPrimElements) {
+    for(const auto& el : findMultiplicativeGroup()) {
         if(deg(conv<ZZ_pX>(el)) > 0) {
-            ZZ_pE potentialPrimEl = el;
-            bool isOK = true;
-            for(ZZ i = conv<ZZ>(2); i < ZZ_pE::cardinality(); i++) {
-                cout << potentialPrimEl << endl;
-                potentialPrimEl *= el;
-                if(IsOne(potentialPrimEl) && i != ZZ_pE::cardinality() - 1) {
-                    isOK = false;
+            bool isPrimitive = true;
+            ZZ_pE potPrimEl = el;
+
+            for(ZZ k = conv<ZZ>(2); k < ZZ_pE::cardinality(); k++) {
+                potPrimEl *= el;
+                if(IsOne(potPrimEl) && k != ZZ_pE::cardinality() - 1) {
+                    isPrimitive = false;
                     break;
                 } 
             }
 
-            if(isOK) {
-                primitiveEl = el;
-                break;
-            }
+            if(isPrimitive) allPrimElements.push_back(el);
         }
     }
+
+    return allPrimElements;
 }
 
 int main() {
