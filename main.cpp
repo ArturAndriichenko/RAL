@@ -1,87 +1,130 @@
 #include <iostream>
-#include <NTL/ZZ_p.h>
-#include <NTL/ZZ_pX.h>
+#include <vector>
+
+#include <NTL/ZZ.h>
+#include <NTL/ZZ_pE.h>
+#include <NTL/ZZ_pXFactoring.h>
 
 using namespace std;
 using namespace NTL;
 
-// (base^exp) % mod
-ZZ power_mod(ZZ base, long exp, ZZ mod) {
-    ZZ result;
-    PowerMod(result, base, exp, mod);
-    return result;
-}
-
 /**
  * Fermat's Little Theorem is used here
 */
-ZZ_p find_primitive_element_GF_p(long p) {
-    ZZ_p::init(ZZ(p)); // Initialize finite field GF(p)
+std::vector<ZZ_p> findPrimitiveElements(long p) {
+    if(p == 2) return {conv<ZZ_p>(1)};
 
-    for (long alpha = 2; alpha < p; ++alpha) {  // Iterate over possible primitive elements {2, ..., p-1}
-        bool is_primitive = true;
+    ZZ_p::init(conv<ZZ>(p));
+    std::vector<ZZ_p> allPrimElements;
 
-        // Check if alpha^(p-1) ≡ 1 (mod p)
-        ZZ exp_result = power_mod(ZZ(alpha), p-1, ZZ(p));
-        if (exp_result != 1)
+    for(long alpha = 2; alpha < p; alpha++) {
+        bool isPrimitive = true;
+        ZZ_p potPrimElem = conv<ZZ_p>(alpha);
+
+        if(power(potPrimElem, p - 1) != 1)
             continue;
 
-        // Check if alpha^k ≠ 1 (mod p) for all k < p-1
-        for (long k = 1; k < p-1; ++k) {
-            ZZ k_exp_result = power_mod(ZZ(alpha), k, ZZ(p));
-            if (k_exp_result == 1) {
-                is_primitive = false;
+        for(long k = 2; k < p - 1; k++) {
+            if(power(potPrimElem, k) == 1) {
+                isPrimitive = false;
                 break;
             }
         }
 
-        if (is_primitive)
-            return ZZ_p(alpha);
+        if(isPrimitive)
+            allPrimElements.push_back(potPrimElem);
     }
 
-    cerr << "Error: No primitive element found in GF(" << p << ")" << endl;
-    exit(1);
+    return allPrimElements;
 }
 
-void parsePrimitivePower(const ZZ& p, ZZ& tBase, ZZ& tExp) {
-    tBase = ZZ(-1);
-    tExp = ZZ(-1);
-
-    for (ZZ base = ZZ(2); base < p; base = NextPrime(base + 1)) {
+int caclPrimitivePower(const ZZ& p, ZZ& tBase, ZZ& tExp) {
+    for(ZZ prime = conv<ZZ>(2); prime < p; prime = NextPrime(prime + 1)) {
         ZZ tempP = p;
         ZZ tempExp = ZZ(0);
-        while(divide(tempP, base)) {
-            tempP /= base;
+        while(divide(tempP, prime)) {
+            tempP /= prime;
             tempExp++;
         }
 
         if(tempP == 1) {
-            tBase = base;
+            tBase = prime;
             tExp = tempExp;
-            return;
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+std::vector<ZZ_pE> findPrimitiveElements(const ZZ& field, const ZZ& polDeg) {
+    ZZ_p::init(field);
+    //ZZ_pX irreducPol;
+    //BuildIrred(irreducPol, conv<long>(polDeg));
+    ZZ_pE::init(BuildIrred_ZZ_pX(conv<long>(polDeg)));
+    std::vector<ZZ_pE> allPrimElements;
+
+    while(allPrimElements.size() != ZZ_pE::cardinality()) {
+        bool alreadyExist = false;
+        ZZ_pE el;
+        random(el);
+        for(const auto& mem : allPrimElements)
+            if(el == mem) {
+                alreadyExist = true;
+                break;
+            }
+
+        if(!alreadyExist) allPrimElements.push_back(el);
+    }
+
+    ZZ_pE primitiveEl;
+    for(const auto& el : allPrimElements) {
+        if(deg(conv<ZZ_pX>(el)) > 0) {
+            ZZ_pE potentialPrimEl = el;
+            bool isOK = true;
+            for(ZZ i = conv<ZZ>(2); i < ZZ_pE::cardinality(); i++) {
+                cout << potentialPrimEl << endl;
+                potentialPrimEl *= el;
+                if(IsOne(potentialPrimEl) && i != ZZ_pE::cardinality() - 1) {
+                    isOK = false;
+                    break;
+                } 
+            }
+
+            if(isOK) {
+                primitiveEl = el;
+                break;
+            }
         }
     }
 }
 
 int main() {
     long p;
-    cout << "Enter a prime number p or prime power p^k (example: 9 (3^2), 25(5^2), ...): ";
+    cout << "Enter p for GF(p): ";
     cin >> p;
 
-    if(ProbPrime(ZZ(p))) {
-        ZZ_p primitiveElement;
-        (p == 2) ? primitiveElement = 1 : primitiveElement = find_primitive_element_GF_p(p);
-        cout << "Primitive element in GF(" << p << "): " << primitiveElement << endl;
+    if(ProbPrime(conv<ZZ>(p))) {
+        const auto& primEls = findPrimitiveElements(p);
+        cout << "\nNumber of primitive elements in GF(" << p << ") is: " << primEls.size() << endl;
+        cout << "Primitive elements in GF(" << p << ") are: ";
+        for(const auto& primEl : primEls)
+            cout << primEl << " ";
     } else {
         ZZ base, exp;
-        parsePrimitivePower(ZZ(p), base, exp);
-        if(base == -1 || exp == -1) {
-            cout << "error: p must be a prime number or a prime power!" << endl;
+        if(caclPrimitivePower(ZZ(p), base, exp)) {
+            const auto& primEls = findPrimitiveElements(base, exp);
+            cout << "\nNumber of primitive elements in GF(" << base << "^" << exp << ") is: " 
+                << primEls.size() << endl;
+            cout << "Primitive elements in GF(" << base << "^" << exp << ") are: ";
+            for(const auto& primEl : primEls)
+                cout << primEl << " ";
+        } else {
+            cout << "Error: 'p' must be a prime number or prime power!" << endl;
             return -1;
         }
-
-        cout << base << "^" << exp << endl;
     }
 
+    cout << endl << endl;
     return 0;
 }
