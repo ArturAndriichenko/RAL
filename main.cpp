@@ -142,8 +142,6 @@ void app(long p) {
     cout << endl << endl;
 }
 
-
-
 int main() {
     printInitial();
 
