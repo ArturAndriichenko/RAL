@@ -104,7 +104,14 @@ std::vector<ZZ_pE> findPrimitiveElements(const ZZ& field, const ZZ& polDeg) {
     return allPrimElements;
 }
 
+inline void printInitial() {
+    cout << "\n***** This program finds all primitive elements in GF(p) *****\n" <<
+        "******* Developed by Artur Andriichenko and Anton Yakovenko *******\n\n\n";
+}
+
 int main() {
+    printInitial();
+
     long p;
     cout << "Enter p for GF(p): ";
     cin >> p;
