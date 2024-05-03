@@ -44,7 +44,7 @@ int caclPrimitivePower(const ZZ& p, ZZ& tBase, ZZ& tExp) {
         ZZ tempExp = ZZ(0);
         while(divide(tempP, prime)) {
             tempP /= prime;
-            tempExp++;
+            ++tempExp;
         }
 
         if(tempP == 1) {
@@ -60,7 +60,7 @@ int caclPrimitivePower(const ZZ& p, ZZ& tBase, ZZ& tExp) {
 std::vector<ZZ_pE> findMultiplicativeGroup() {
     std::vector<ZZ_pE> multiplicativeGroup;
 
-    while(multiplicativeGroup.size() != ZZ_pE::cardinality()) {
+    while(static_cast<long>(multiplicativeGroup.size()) != ZZ_pE::cardinality()) {
         bool isAlreadyExist = false;
         ZZ_pE el = random_ZZ_pE();
 
@@ -79,8 +79,6 @@ std::vector<ZZ_pE> findMultiplicativeGroup() {
 
 std::vector<ZZ_pE> findPrimitiveElements(const ZZ& field, const ZZ& polDeg) {
     ZZ_p::init(field);
-    //ZZ_pX irreducPol;
-    //BuildIrred(irreducPol, conv<long>(polDeg));
     ZZ_pE::init(BuildIrred_ZZ_pX(conv<long>(polDeg)));
     std::vector<ZZ_pE> allPrimElements;
 
@@ -109,34 +107,69 @@ inline void printInitial() {
         "******* Developed by Artur Andriichenko and Anton Yakovenko *******\n\n\n";
 }
 
-int main() {
-    printInitial();
-
-    long p;
-    cout << "Enter p for GF(p): ";
-    cin >> p;
+void app(long p) {
 
     if(ProbPrime(conv<ZZ>(p))) {
         const auto& primEls = findPrimitiveElements(p);
         cout << "\nNumber of primitive elements in GF(" << p << ") is: " << primEls.size() << endl;
         cout << "Primitive elements in GF(" << p << ") are: ";
-        for(const auto& primEl : primEls)
-            cout << primEl << " ";
+        for(const auto& primEl : primEls) {
+            if (primEl != *primEls.begin()) {
+                cout << ", ";
+            }
+
+            cout << primEl;
+        }
     } else {
         ZZ base, exp;
         if(caclPrimitivePower(ZZ(p), base, exp)) {
             const auto& primEls = findPrimitiveElements(base, exp);
-            cout << "\nNumber of primitive elements in GF(" << base << "^" << exp << ") is: " 
+            cout << "\nNumber of primitive elements in GF(" << base << "^" << exp << ") is: "
                 << primEls.size() << endl;
             cout << "Primitive elements in GF(" << base << "^" << exp << ") are: ";
-            for(const auto& primEl : primEls)
-                cout << primEl << " ";
+            for(const auto& primEl : primEls) {
+                if (primEl != *primEls.begin()) {
+                    cout << ", ";
+                }
+
+                cout << primEl;
+            }
         } else {
-            cout << "Error: 'p' must be a prime number or prime power!" << endl;
-            return -1;
+            cout << "Error: 'p' must be a prime number or prime power!";
         }
     }
 
     cout << endl << endl;
+}
+
+
+
+int main() {
+    printInitial();
+
+    while (true) {
+        string input;
+        long p;
+        cout << "Enter p for GF(p) or 'q' to quit: ";
+        cin >> input;
+
+        if (input == "q") {
+            cout << "Exiting program..." << endl;
+            break;
+        }
+
+        try {
+            p = stol(input);
+        } catch (const std::invalid_argument& e) {
+            cout << e.what() << ": Invalid argument: " << input << endl;
+            continue;
+        } catch (const std::out_of_range& e) {
+            cout << e.what() << ": Out of range error: " << input << endl;
+            continue;
+        }
+
+        app(p);
+    }
+
     return 0;
 }
