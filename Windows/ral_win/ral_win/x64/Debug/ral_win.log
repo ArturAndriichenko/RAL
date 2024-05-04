@@ -1,0 +1,5 @@
+﻿  ral_win.cpp
+C:\Users\overu\Downloads\WinNTL-11_5_1\include\NTL\lip.h(399,40): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+  (compiling source file 'ral_win.cpp')
+  
+  ral_win.vcxproj -> D:\Anton\STU\6_term\ral\RAL\Windows\ral_win\x64\Debug\ral_win.exe

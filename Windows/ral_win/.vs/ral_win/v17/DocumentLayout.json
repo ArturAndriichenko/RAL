@@ -1,0 +1,41 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Anton\\STU\\6_term\\ral\\RAL\\Windows\\ral_win\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B4E960B3-4C2A-4ED6-ABF9-10DEC7AA104F}|ral_win\\ral_win.vcxproj|D:\\Anton\\STU\\6_term\\ral\\RAL\\Windows\\ral_win\\ral_win\\ral_win.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{B4E960B3-4C2A-4ED6-ABF9-10DEC7AA104F}|ral_win\\ral_win.vcxproj|solutionrelative:ral_win\\ral_win.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ral_win.cpp",
+              "DocumentMoniker": "D:\\Anton\\STU\\6_term\\ral\\RAL\\Windows\\ral_win\\ral_win\\ral_win.cpp",
+              "RelativeDocumentMoniker": "ral_win\\ral_win.cpp",
+              "ToolTip": "D:\\Anton\\STU\\6_term\\ral\\RAL\\Windows\\ral_win\\ral_win\\ral_win.cpp",
+              "RelativeToolTip": "ral_win\\ral_win.cpp",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAALMAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-05-04T12:48:30.457Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
