@@ -77,9 +77,10 @@ std::vector<ZZ_pE> findMultiplicativeGroup() {
     return multiplicativeGroup;
 }
 
-std::vector<ZZ_pE> findPrimitiveElements(const ZZ& field, const ZZ& polDeg) {
+std::vector<ZZ_pE> findPrimitiveElements(const ZZ& field, const ZZ& polDeg, ZZ_pX& irreducPol) {
     ZZ_p::init(field);
-    ZZ_pE::init(BuildIrred_ZZ_pX(conv<long>(polDeg)));
+    BuildIrred(irreducPol, conv<long>(polDeg));
+    ZZ_pE::init(irreducPol);
     std::vector<ZZ_pE> allPrimElements;
 
     for(const auto& el : findMultiplicativeGroup()) {
@@ -123,10 +124,11 @@ void app(long p) {
     } else {
         ZZ base, exp;
         if(caclPrimitivePower(ZZ(p), base, exp)) {
-            const auto& primEls = findPrimitiveElements(base, exp);
-            cout << "\nNumber of primitive elements in GF(" << base << "^" << exp << ") is: "
+            ZZ_pX irredPol;
+            const auto& primEls = findPrimitiveElements(base, exp, irredPol);
+            cout << "\nNumber of primitive elements in GF(" << base << ")[x]|" << irredPol << " is: "
                 << primEls.size() << endl;
-            cout << "Primitive elements in GF(" << base << "^" << exp << ") are: ";
+            cout << "Primitive elements in GF(" << base << ")[x]|" << irredPol << " are: ";
             for(const auto& primEl : primEls) {
                 if (primEl != *primEls.begin()) {
                     cout << ", ";
